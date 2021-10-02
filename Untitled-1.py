@@ -228,7 +228,7 @@ def simulateCharges(charge, mass, position, velocity, time, dt):
     return tlist, position_t, velocity_t, acceleration_t
 
 def getParticleInfo(particleNum, attribute_t):
-    particleNum -= 1 #because particle indexing starts at 0 in python
+    particleNum = particleNum - 1 #because particle indexing starts at 0 in python
     x_t = []
     y_t = []
     for i in attribute_t:
@@ -249,14 +249,30 @@ def animate(tlist, position_t, charge, dt):
             exec(f'position_x.append(x{j}_t[i])')
             exec(f'position_y.append(y{j}_t[i])')
         position = np.array([position_x, position_y])
-        x,y = np.meshgrid(np.linspace(-10,10,a),np.linspace(-10,10,a))
+        x,y = np.meshgrid(np.linspace(-1000,1000,a),np.linspace(-1000,1000,a))
         x = np.reshape(x, (a**2,1))
         y = np.reshape(y, (a**2,1))
         Ex, Ey = E(x, y, charge, position)
         Ex, Ey = getUnitVector(Ex, Ey)
         plt.quiver(x, y, Ex, Ey)
-        plotCharge(charge, position)
-        plt.show()
-        plt.pause(dt)
+        X = position[0]
+        Y = position[1]
+        for i in range(0,len(charge)):
+            if charge[i] > 0:
+                plt.plot(X[i], Y[i], 'o', markersize=12, c='red')
+                plt.plot(X[i], Y[i], '+', markersize=10, c='black')
+            else:
+                plt.plot(X[i], Y[i], 'o', markersize=12, c='red')
+                plt.plot(X[i], Y[i], '_', markersize=10, c='black')
+        #plt.pause(dt)
         
+# %%
+charge = np.array([-3e-19, -3e-19, -3e-19])
+position = np.array([[1,2,5], [1,-1,2]])
+mass = np.array([1e-31, 1e-31, 1e-31])
+velocity = np.array([[0,0,0], [0,0,0]])
+time = 5
+dt = 0.1
+tlist, position_t, velocity_t, acceleration_t = simulateCharges(charge, mass, position, velocity, time, dt)
+animate(tlist, position_t, charge, dt)
 # %%
