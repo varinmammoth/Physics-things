@@ -142,7 +142,10 @@ def getForce(charge, position):
         y_i = y_on_i.pop(i)
         #Note: the .pop(i) command removes ith element and returns it
         Ex_on_i, Ey_on_i = E([x_i], [y_i], charge_on_i, np.array([x_on_i, y_on_i]))
-        Fx_on_i, Fy_on_i = charge_i*Ex_on_i, charge_i*Ey_on_i
+        Fx_on_i, Fy_on_i = charge_i*Ex_on_i[0], charge_i*Ey_on_i[0]
+        #Note: Needed the [0] at the end of Ex_on_i and Ey_on_i because
+        #generally E(x,y,...) returns an array when x and y are arrays,
+        #but here, x and y is just a single-valued array
         Fx.append(Fx_on_i)
         Fy.append(Fy_on_i)
     return np.array([Fx, Fy])
@@ -172,15 +175,14 @@ def getFuturePos(charge, mass, position, velocity, dt):
         acceleration: current acceleration, in case we want to plot it
     """
     forces_x, forces_y = getForce(charge, position)
-    X, Y = position[0], position[1]
-    Vx, Vy = velocity[0], velocity[1]
-    Ax, Ay = forces_x/mass, forces_y/mass
+    X, Y = np.array(position[0]), np.array(position[1])
+    Vx, Vy = np.array(velocity[0]), np.array(velocity[1])
+    Ax, Ay = np.array(np.divide(forces_x, mass)), np.array(np.divide(forces_y, mass))
     Xnew, Ynew, Vxnew, Vynew = [], [], [], []
-    for i in range(0,len(charge)):
-        Vxnew.append(Vx[i]+dt*Ax[i])
-        Vynew.append(Vy[i]+dt*Ay[i])
-        Xnew.append(X[i]+dt*Vx[i])
-        Ynew.append(Y[i]+dt*Vy[i])
+    Vxnew.append(Vx+dt*Ax)
+    Vynew.append(Vy+dt*Ay)
+    Xnew.append(X+dt*Vx)
+    Ynew.append(Y+dt*Vy)
     positionNew = np.array([Xnew, Ynew])
     velocityNew = np.array([Vxnew, Vynew])
     acceleration = np.array([Ax, Ay])
@@ -188,6 +190,7 @@ def getFuturePos(charge, mass, position, velocity, dt):
 
 def simulateCharges(charge, mass, position, velocity, time, dt):
     """
+    Simulate motion of charges using finite differences approximation.
     Args:
         charge (array float): array of charges
         mass (array of float): array of masses
@@ -201,6 +204,7 @@ def simulateCharges(charge, mass, position, velocity, time, dt):
     Returns:
         tlist: array of times
         position_t: array of positions at each time in tlist
+            Position of charges at time tlist[i] is given by position_t[i]
         velocity_t: array of velocity at each time in tlist
         acceleration_t: acceleration at each time in tlist. Subtle note: the acceleration
             lags behind by one index. Eg. acceleration_t[i] gives the acceleration at time
@@ -219,3 +223,4 @@ def simulateCharges(charge, mass, position, velocity, time, dt):
         velocity_t.append(velocity)
         acceleration_t.append(acceleration)
     return tlist, position_t, velocity_t, acceleration_t
+# %%
