@@ -101,7 +101,7 @@ def plotE(xmin,xmax,ymin,ymax,charge,position,a):
         xmax (float): maximum x value of chart.
         ymin...
         ymax...
-        charge (array float): array of charges
+        charge (array of float): array of charges
         position (iterable of float): (x, y) position(s) of the point charge(s).
             If an array is given, it should be a (2, N) array where N
             is the number of point charges.
@@ -178,11 +178,10 @@ def getFuturePos(charge, mass, position, velocity, dt):
     X, Y = np.array(position[0]), np.array(position[1])
     Vx, Vy = np.array(velocity[0]), np.array(velocity[1])
     Ax, Ay = np.array(np.divide(forces_x, mass)), np.array(np.divide(forces_y, mass))
-    Xnew, Ynew, Vxnew, Vynew = [], [], [], []
-    Vxnew.append(Vx+dt*Ax)
-    Vynew.append(Vy+dt*Ay)
-    Xnew.append(X+dt*Vx)
-    Ynew.append(Y+dt*Vy)
+    Vxnew = Vx+dt*Ax
+    Vynew = Vy+dt*Ay
+    Xnew = X+dt*Vx
+    Ynew = Y+dt*Vy
     positionNew = np.array([Xnew, Ynew])
     velocityNew = np.array([Vxnew, Vynew])
     acceleration = np.array([Ax, Ay])
@@ -205,10 +204,14 @@ def simulateCharges(charge, mass, position, velocity, time, dt):
         tlist: array of times
         position_t: array of positions at each time in tlist
             Position of charges at time tlist[i] is given by position_t[i]
+            position_t[i][0] gives x coordinates of charges at time tlist[i]
+            position_t[i][1] gives y coordinates of charges at time tlist[i]
         velocity_t: array of velocity at each time in tlist
+            works similiar to postion_t
         acceleration_t: acceleration at each time in tlist. Subtle note: the acceleration
             lags behind by one index. Eg. acceleration_t[i] gives the acceleration at time
             tlist[i-1].
+            Works similiar to acceleration_t
     """
     t = 0
     tlist =[]
@@ -223,4 +226,13 @@ def simulateCharges(charge, mass, position, velocity, time, dt):
         velocity_t.append(velocity)
         acceleration_t.append(acceleration)
     return tlist, position_t, velocity_t, acceleration_t
+
+def getParticleInfo(particleNum, attribute_t):
+    particleNum -= 1 #because particle indexing starts at 0 in python
+    x_t = []
+    y_t = []
+    for i in attribute_t:
+        x_t.append(i[0][particleNum])
+        y_t.append(i[1][particleNum])
+    return x_t, y_t
 # %%
