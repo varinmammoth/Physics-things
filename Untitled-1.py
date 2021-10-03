@@ -264,7 +264,7 @@ def animate(tlist, position_t, charge, dt):
             else:
                 plt.plot(X[i], Y[i], 'o', markersize=12, c='red')
                 plt.plot(X[i], Y[i], '_', markersize=10, c='black')
-        #plt.pause(dt)
+        plt.pause(dt)
         
 # %%
 charge = np.array([-3e-19, -3e-19, -3e-19])
